@@ -111,13 +111,18 @@
     </div>
 
     <script>
-        let currentPerson = 1; // الرقم الحالي للشخص
+        // استرجاع الرقم المخزن في localStorage أو تعيينه إلى 4 كقيمة افتراضية
+        let currentPerson = localStorage.getItem('currentPerson') ? parseInt(localStorage.getItem('currentPerson')) : 4;
         const numberDiv = document.getElementById('number'); // العنصر لعرض الرقم
-        nextButton = document.getElementById('nextButton'); // زر الخروج
+        const nextButton = document.getElementById('nextButton'); // زر الخروج
+
+        // تحديث الرقم على الصفحة عند التحميل
+        numberDiv.innerText = currentPerson;
 
         // زيادة الرقم عند الضغط على الزر "Next"
         nextButton.addEventListener('click', () => {
             currentPerson++;  // زيادة الرقم
+            localStorage.setItem('currentPerson', currentPerson); // تخزين الرقم الجديد
             numberDiv.innerText = currentPerson;  // تحديث الرقم في الصفحة
         });
     </script>

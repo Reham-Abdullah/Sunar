@@ -103,7 +103,7 @@
         <!-- النص الذي يعرض الرقم الحالي -->
         <div id="currentPerson">
             <span>Current person no:</span>
-            <span id="number"></span>
+            <span id="number">1</span>
         </div>
 
         <!-- الزر التالي -->
@@ -113,7 +113,7 @@
     <script>
         let currentPerson = nunmber; // الرقم الحالي للشخص
         const numberDiv = document.getElementById('number'); // العنصر لعرض الرقم
-        const nextButton = document.getElementById('nextButton'); // زر الخروج
+        nextButton = document.getElementById('nextButton'); // زر الخروج
 
         // زيادة الرقم عند الضغط على الزر "Next"
         nextButton.addEventListener('click', () => {

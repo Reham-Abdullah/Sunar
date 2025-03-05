@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONAR ROOM</title>
+    <style>
+        /* أسلوب الجسم */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #feffff; /* خلفية باللون الأزرق الفاتح */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* ترتيب العناصر بشكل عمودي */
+            height: 100vh; /* تغطي الصفحة بالكامل */
+            position: relative;
+        }
+
+        /* العنوان */
+        h1 {
+            color: #085589; /* لون العنوان */
+            font-size: 2em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        /* الشعار في أعلى الصفحة على اليمين */
+        #logo {
+            width: 100px; /* عرض الشعار */
+            position: absolute;
+            top: 20px;  /* المسافة من أعلى الصفحة */
+            right: 20px; /* المسافة من يمين الصفحة */
+        }
+
+        /* الحاوية الرئيسية التي تحتوي على الزر */
+        #container {
+            background: #085589;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* تأثير ظل ناعم */
+            width: 500px; /* عرض ثابت للحاوية */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 80px; /* المسافة من العنوان */
+        }
+
+        /* النص الذي يعرض الرقم الحالي */
+        #currentPerson {
+            //display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 1.2em;
+            color: white;
+            margin-bottom: 30px;
+        }
+        /* تعديل حجم الرقم ليكون أكبر من النص */
+        #currentPerson span:last-child {
+            font-size: 1.4em; /* جعل الرقم أكبر من النص */
+            font-weight: bold;
+        }
+
+        /* الزر */
+        #nextButton {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: white;
+            background-color: #f9cb14;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* تأثيرات الزر عند التمرير */
+        #nextButton:hover {
+            background-color: #7ea1b3;
+            transform: scale(1.05); /* تكبير الزر قليلاً عند التمرير */
+        }
+
+        /* تأثير عند الضغط على الزر */
+        #nextButton:active {
+            background-color: #00332b;
+            transform: scale(1.02);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- الشعار في أعلى الصفحة على اليمين -->
+    <img id="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1vMR5yZjv_nmEMxBVeVJ4qYRPP-jdbwUp6A&s/100" alt="شعار عيادة عادل كير الطبية">
+
+    <!-- العنوان -->
+    <h1>SONAR ROOM</h1>
+
+    <!-- الحاوية التي تحتوي على الزر والمحتوى -->
+    <div id="container">
+        <!-- النص الذي يعرض الرقم الحالي -->
+        <div id="currentPerson">
+            <span>Current person no:</span>
+            <span id="number">1</span>
+        </div>
+
+        <!-- الزر التالي -->
+        <button id="nextButton">Next</button>
+    </div>
+
+    <script>
+        let currentPerson = 1; // الرقم الحالي للشخص
+        const numberDiv = document.getElementById('number'); // العنصر لعرض الرقم
+        const nextButton = document.getElementById('nextButton'); // زر الخروج
+
+        // زيادة الرقم عند الضغط على الزر "Next"
+        nextButton.addEventListener('click', () => {
+            currentPerson++;  // زيادة الرقم
+            numberDiv.innerText = currentPerson;  // تحديث الرقم في الصفحة
+        });
+    </script>
+
+</body>
+</html>

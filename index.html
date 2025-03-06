@@ -58,15 +58,19 @@
             font-weight: bold;
         }
 
-        #nextButton {
+        #nextButton, #resetButton {
             padding: 15px 30px;
             font-size: 1.2em;
             color: white;
-            background-color: #f9cb14;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-bottom: 30px; /* تباعد بين الأزرار */
+        }
+
+        #nextButton {
+            background-color: #f9cb14;
         }
 
         #nextButton:hover {
@@ -76,6 +80,23 @@
 
         #nextButton:active {
             background-color: #00332b;
+            transform: scale(1.02);
+        }
+
+        /* زر التصفير */
+        #resetButton {
+            background-color: #7ea1b3; 
+            font-size: 0.8em; /* أصغر من زر Next */
+            padding: 10px 20px;
+        }
+
+        #resetButton:hover {
+            background-color: #678594;
+            transform: scale(1.05);
+        }
+
+        #resetButton:active {
+            background-color: #678594;
             transform: scale(1.02);
         }
 
@@ -93,11 +114,12 @@
             <span id="numberDiv">Loading...</span>
         </div>
         <button id="nextButton">Next</button>
+        <button id="resetButton">Reset</button> <!-- زر التصفير -->
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, runTransaction } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "1:58677565284:web:f6d257b9bf5643afa18c71",
@@ -133,6 +155,15 @@
                 console.log("✅ New value:", result.snapshot.val());
             }).catch((error) => {
                 console.error("❌ Transaction error:", error);
+            });
+        });
+
+        // 🔴 زر "Reset" لتصفير الرقم
+        document.getElementById("resetButton").addEventListener('click', () => {
+            set(numberRef, 0).then(() => {
+                console.log("🔄 Database reset to 0");
+            }).catch((error) => {
+                console.error("❌ Reset error:", error);
             });
         });
 

@@ -5,66 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SONAR ROOM</title>
     <style>
-        /* أسلوب الجسم */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #feffff; /* خلفية باللون الأزرق الفاتح */
+            background-color: #feffff;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column; /* ترتيب العناصر بشكل عمودي */
-            height: 100vh; /* تغطي الصفحة بالكامل */
+            flex-direction: column;
+            height: 100vh;
             position: relative;
         }
 
-        /* العنوان */
         h1 {
-            color: #085589; /* لون العنوان */
+            color: #085589;
             font-size: 2em;
             margin-top: 20px;
             font-weight: bold;
         }
 
-        /* الشعار في أعلى الصفحة على اليمين */
         #logo {
-            width: 100px; /* عرض الشعار */
+            width: 100px;
             position: absolute;
-            top: 20px;  /* المسافة من أعلى الصفحة */
-            right: 20px; /* المسافة من يمين الصفحة */
+            top: 20px;
+            right: 20px;
         }
 
-        /* الحاوية الرئيسية التي تحتوي على الزر */
         #container {
             background: #085589;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* تأثير ظل ناعم */
-            width: 500px; /* عرض ثابت للحاوية */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 500px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 80px; /* المسافة من العنوان */
+            margin-top: 80px;
         }
 
-        /* النص الذي يعرض الرقم الحالي */
         #currentPerson {
-            //display: flex;
             justify-content: space-between;
             width: 100%;
             font-size: 1.2em;
             color: white;
             margin-bottom: 30px;
         }
-        /* تعديل حجم الرقم ليكون أكبر من النص */
+
         #currentPerson span:last-child {
-            font-size: 1.4em; /* جعل الرقم أكبر من النص */
+            font-size: 1.4em;
             font-weight: bold;
         }
 
-        /* الزر */
         #nextButton {
             padding: 15px 30px;
             font-size: 1.2em;
@@ -76,13 +69,11 @@
             transition: all 0.3s ease;
         }
 
-        /* تأثيرات الزر عند التمرير */
         #nextButton:hover {
             background-color: #7ea1b3;
-            transform: scale(1.05); /* تكبير الزر قليلاً عند التمرير */
+            transform: scale(1.05);
         }
 
-        /* تأثير عند الضغط على الزر */
         #nextButton:active {
             background-color: #00332b;
             transform: scale(1.02);
@@ -92,39 +83,59 @@
 </head>
 <body>
 
-    <!-- الشعار في أعلى الصفحة على اليمين -->
     <img id="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1vMR5yZjv_nmEMxBVeVJ4qYRPP-jdbwUp6A&s/100" alt="شعار عيادة عادل كير الطبية">
 
-    <!-- العنوان -->
-    <h1>SONAR ROOM</h1>
+    <h1>SUNAR ROOM</h1>
 
-    <!-- الحاوية التي تحتوي على الزر والمحتوى -->
     <div id="container">
-        <!-- النص الذي يعرض الرقم الحالي -->
         <div id="currentPerson">
             <span>Current person no:</span>
-            <span id="number">1</span>
+            <span id="numberDiv">Loading...</span>
         </div>
-
-        <!-- الزر التالي -->
         <button id="nextButton">Next</button>
     </div>
 
-    <script>
-        // استرجاع الرقم المخزن في localStorage أو تعيينه إلى 4 كقيمة افتراضية
-        let currentPerson = localStorage.getItem('currentPerson') ? parseInt(localStorage.getItem('currentPerson')) : 4;
-        const numberDiv = document.getElementById('number'); // العنصر لعرض الرقم
-        const nextButton = document.getElementById('nextButton'); // زر الخروج
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
-        // تحديث الرقم على الصفحة عند التحميل
-        numberDiv.innerText = currentPerson;
+        const firebaseConfig = {
+            apiKey: "1:58677565284:web:f6d257b9bf5643afa18c71",
+            authDomain: "sunar-53ade.firebaseapp.com",
+            databaseURL: "https://sunar-53ade-default-rtdb.firebaseio.com/",
+            projectId: "sunar-53ade",
+            storageBucket: "sunar-53ade.appspot.com",
+            messagingSenderId: "58677565284",
+            appId: "1:58677565284:web:f6d257b9bf5643afa18c71"
+        };
 
-        // زيادة الرقم عند الضغط على الزر "Next"
-        nextButton.addEventListener('click', () => {
-            currentPerson++;  // زيادة الرقم
-            localStorage.setItem('currentPerson', currentPerson); // تخزين الرقم الجديد
-            numberDiv.innerText = currentPerson;  // تحديث الرقم في الصفحة
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const numberRef = ref(database, '/currentPerson');
+
+        // 🟢 تحديث الرقم في صفحة الويب عند تغييره في Firebase
+        onValue(numberRef, (snapshot) => {
+            const numberDiv = document.getElementById("numberDiv");
+            if (snapshot.exists()) {
+                numberDiv.innerText = snapshot.val();
+            } else {
+                numberDiv.innerText = "No data";
+            }
+        }, (error) => {
+            console.error("❌ Error fetching data:", error);
         });
+
+        // 🟢 زر "Next" لزيادة الرقم
+        document.getElementById("nextButton").addEventListener('click', () => {
+            runTransaction(numberRef, (currentPerson) => {
+                return (currentPerson || 0) + 1;
+            }).then((result) => {
+                console.log("✅ New value:", result.snapshot.val());
+            }).catch((error) => {
+                console.error("❌ Transaction error:", error);
+            });
+        });
+
     </script>
 
 </body>

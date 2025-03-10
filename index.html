@@ -15,23 +15,19 @@
             align-items: center;
             flex-direction: column;
             height: 100vh;
-            position: relative;
         }
-
         h1 {
             color: #085589;
             font-size: 2em;
-            margin-top: 20px;
+            margin-top: 10px;
             font-weight: bold;
+            text-align: center;
         }
-
         #logo {
-            width: 100px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            width: 120px;
+            height: auto;
+            margin-bottom: 10px;
         }
-
         #container {
             background: #085589;
             padding: 40px;
@@ -42,84 +38,68 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 80px;
-            position: relative; /* لجعل الزر "Reset" في مكان ثابت داخل الحاوية */
         }
-
-        #currentPerson {
-            justify-content: space-between;
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
             width: 100%;
-            font-size: 1.3em;
-            color: white;
-            margin-bottom: 30px;
         }
-
-        #currentPerson span:last-child {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        #nextButton {
-            padding: 15px 30px;
+        .section h2 {
+            margin: 0 0 10px;
             font-size: 1.2em;
-            color: white;
-            background-color: #f9cb14;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
+            color: #085589;
         }
-
-        #nextButton:hover {
-            background-color: #7ea1b3;
-            transform: scale(1.05);
-        }
-
-        #nextButton:active {
-            background-color: #00332b;
-            transform: scale(1.02);
-        }
-
-        /* زر التصفير */
-        #resetButton {
-            background-color: #7ea1b3;
-            font-size: 0.8em;
+        button {
             padding: 10px 20px;
+            font-size: 1em;
+            color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            margin: 5px;
             transition: all 0.3s ease;
-            position: absolute;
-            left: 20px;
-            bottom: 20px;
         }
-
-        #resetButton:hover {
-            background-color: white;
-            transform: scale(1.05);
-        }
-
-        #resetButton:active {
-            background-color: #65818f;
-            transform: scale(1.02);
-        }
-
+        #receptionButton { background-color: #4caf50; }
+        #nextButton { background-color: #f9cb14; }
+        #emergencyButton { background-color: #ff5733; }
+        #nextEmergencyButton { background-color: #c70039; }
+        #resetButton { background-color: #7ea1b3; margin-top: 20px; }
+        button:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
+    <!-- ✅ إضافة صورة اللوجو -->
+    <img id="logo" src="https://media.licdn.com/dms/image/v2/C4D0BAQEXaCh1vZalug/company-logo_200_200/company-logo_200_200/0/1677395381343?e=2147483647&v=beta&t=3SXqczPpjmMmZY503HhcrekKxbnUfAQDiUV3OtJm_vs" alt="SUNAR ROOM Logo" width="150" height="150">
 
-    <img id="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1vMR5yZjv_nmEMxBVeVJ4qYRPP-jdbwUp6A&s/100" alt="شعار عيادة عادل كير الطبية">
-
+    <!-- ✅ العنوان الرئيسي -->
     <h1>SUNAR ROOM</h1>
 
     <div id="container">
-        <div id="currentPerson">
-            <span>Current person no:</span>
-            <span id="numberDiv">Loading...</span>
+        <div class="section">
+            <h2>Reception Desk</h2>
+            <div id="receptionCount">Current Cases: Loading...</div>
+            <button id="receptionButton">Add New Case</button>
         </div>
-        <button id="nextButton">Next</button>
-        <button id="resetButton">Reset</button> <!-- زر التصفير -->
+        <div class="section">
+            <h2>Current Normal Case</h2>
+            <div id="currentPerson">
+                <span>Normal case no:</span>
+                <span id="numberDiv">Loading...</span>
+            </div>
+            <button id="nextButton">Next Normal</button>
+        </div>
+        <div class="section">
+            <h2>Current Emergency Case</h2>
+            <div id="currentEmergency">
+                <span>Emergency case no:</span>
+                <span id="emergencyNumberDiv">Loading...</span>
+            </div>
+            <button id="emergencyButton">Transfer to Emergency</button>
+            <button id="nextEmergencyButton">Next Emergency</button>
+        </div>
+        <button id="resetButton">Reset</button>
     </div>
 
     <script type="module">
@@ -138,38 +118,61 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-        const numberRef = ref(database, '/currentPerson');
 
-        onValue(numberRef, (snapshot) => {
-            const numberDiv = document.getElementById("numberDiv");
-            if (snapshot.exists()) {
-                numberDiv.innerText = snapshot.val();
-            } else {
-                numberDiv.innerText = "No data";
-            }
-        }, (error) => {
-            console.error("❌ Error fetching data:", error);
+        const receptionRef = ref(database, '/receptionCount');
+        const normalQueueRef = ref(database, '/normalQueue');
+        const emergencyQueueRef = ref(database, '/emergencyQueue');
+        const lastCaseNumberRef = ref(database, '/lastCaseNumber');
+
+        onValue(receptionRef, (snapshot) => {
+            document.getElementById("receptionCount").innerText = `Current Cases: ${snapshot.val() || 0}`;
+        });
+
+        onValue(normalQueueRef, (snapshot) => {
+            const queue = snapshot.val() || [];
+            document.getElementById("numberDiv").innerText = queue.length > 0 ? queue[0] : "No data";
+        });
+
+        onValue(emergencyQueueRef, (snapshot) => {
+            const queue = snapshot.val() || [];
+            document.getElementById("emergencyNumberDiv").innerText = queue.length > 0 ? queue[0] : "No data";
+        });
+
+        document.getElementById("receptionButton").addEventListener('click', () => {
+            runTransaction(lastCaseNumberRef, (lastNumber) => (lastNumber || 0) + 1)
+                .then(({ snapshot }) => {
+                    const newNumber = snapshot.val();
+                    runTransaction(normalQueueRef, (queue) => [...(queue || []), newNumber]);
+                    runTransaction(receptionRef, (current) => (current || 0) + 1);
+                });
         });
 
         document.getElementById("nextButton").addEventListener('click', () => {
-            runTransaction(numberRef, (currentPerson) => {
-                return (currentPerson || 0) + 1;
-            }).then((result) => {
-                console.log("✅ New value:", result.snapshot.val());
-            }).catch((error) => {
-                console.error("❌ Transaction error:", error);
-            });
+            runTransaction(normalQueueRef, (queue) => queue?.length > 1 ? queue.slice(1) : []);
         });
 
         document.getElementById("resetButton").addEventListener('click', () => {
-            set(numberRef, 0).then(() => {
-                console.log("🔄 Database reset to 0");
-            }).catch((error) => {
-                console.error("❌ Reset error:", error);
+            set(receptionRef, 0);
+            set(normalQueueRef, []);
+            set(emergencyQueueRef, []);
+            set(lastCaseNumberRef, 0);
+        });
+
+        document.getElementById("emergencyButton").addEventListener('click', () => {
+            runTransaction(normalQueueRef, (queue) => {
+                if (queue?.length > 0) {
+                    const patientNumber = queue[0];
+                    runTransaction(emergencyQueueRef, (emergencyQueue) => [...(emergencyQueue || []), patientNumber]);
+                    return queue.slice(1);
+                }
+                return queue;
             });
         });
 
-    </script>
+        document.getElementById("nextEmergencyButton").addEventListener('click', () => {
+            runTransaction(emergencyQueueRef, (queue) => queue?.length > 1 ? queue.slice(1) : []);
+        });
 
+    </script>
 </body>
 </html>
